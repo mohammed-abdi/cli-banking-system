@@ -8,20 +8,20 @@ import com.itsmamme.utils.Policy;
 
 public class Account extends Policy {
 
-    private String account;
+    private String accountNumber;
     private double balance;
 
-    public Account(String account, double initialBalance) {
-        this.account = account;
-        this.balance = initialBalance;
+    public Account(String accountNumber, double balance) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
     }
 
     public double getBalance() {
-        return this.balance;
+        return balance;
     }
 
     public String getAccount() {
-        return this.account;
+        return accountNumber;
     }
 
     public void deposit(double amount) {
