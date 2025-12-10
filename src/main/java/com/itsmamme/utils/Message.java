@@ -6,7 +6,7 @@ public final class Message {
     }
 
     public static String success(String message) {
-        return Text.color.green("✔️ ") + message;
+        return Text.color.green("✔ ") + message;
     }
 
     public static String error(String message) {
