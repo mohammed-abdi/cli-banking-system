@@ -20,7 +20,7 @@ public class Account extends Policy {
         return balance;
     }
 
-    public String getAccount() {
+    public String getAccountNumber() {
         return accountNumber;
     }
 
