@@ -19,6 +19,7 @@ public final class UserRepository {
 
     private static final File USERS_FILE = new File("users.txt");
     private static final Map<String, User> users = new HashMap<>();
+    public static User currentUser;
 
     private UserRepository() {
     }
