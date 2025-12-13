@@ -28,7 +28,7 @@ public class Auth {
         User user = UserRepository.getUser(username);
 
         if (user.passwordMatch(password)) {
-            UserRepository.currentUser = user;
+            UserRepository.setCurrentUser(user);
             return true;
         } else {
             return false;
@@ -56,7 +56,7 @@ public class Auth {
         User newUser = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
                 true);
 
-        UserRepository.save(newUser);
-        UserRepository.currentUser = newUser;
+        UserRepository.save(newUser, false);
+        UserRepository.setCurrentUser(newUser);
     }
 }
