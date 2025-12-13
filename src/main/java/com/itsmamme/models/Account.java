@@ -1,9 +1,5 @@
 package com.itsmamme.models;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
-import com.itsmamme.utils.Message;
 import com.itsmamme.utils.Policy;
 
 public class Account extends Policy {
@@ -24,41 +20,32 @@ public class Account extends Policy {
         return accountNumber;
     }
 
-    public void deposit(double amount) {
+    public int deposit(double amount) {
         if (!isValid(amount)) {
-            System.out.println(Message.error(amount + " is not a valid amount"));
+            return 400;
         } else if (amount < minDepositAmount) {
-            System.out.println(Message.error(
-                    NumberFormat.getNumberInstance(Locale.US).format(minDepositAmount) + " is the minimum deposit"));
+            return 402;
         } else if (amount >= maxDepositAmount) {
-            System.out.println(
-                    Message.error(NumberFormat.getNumberInstance(Locale.US).format(maxDepositAmount)
-                            + " is the maximum deposit, please reach out to our nearby branch"));
+            return 403;
         } else {
             balance = balance + amount;
-            System.out.println(Message.success(
-                    "$" + NumberFormat.getNumberInstance(Locale.US).format(amount) + " deposited successfully"));
+            return 200;
         }
 
     }
 
-    public void withdraw(double amount) {
+    public int withdraw(double amount) {
         if (!isValid(amount)) {
-            System.out.println(Message.error(amount + " is not a valid amount"));
+            return 400;
         } else if (amount < minWithdrawalAmount) {
-            System.out.println(Message.error(
-                    NumberFormat.getNumberInstance(Locale.US).format(minWithdrawalAmount)
-                            + " is the minimum withdrawal"));
+            return 402;
         } else if (amount >= maxWithdrawalAmount) {
-            System.out.println(
-                    Message.error(NumberFormat.getNumberInstance(Locale.US).format(maxWithdrawalAmount)
-                            + " is the maximum withdrawal, please reach out to our nearby branch"));
+            return 403;
         } else if (amount > balance) {
-            System.out.println(Message.error("Your balance is insufficient"));
+            return 405;
         } else {
             balance = balance - amount;
-            System.out.println(Message.success(
-                    "$" + NumberFormat.getNumberInstance(Locale.US).format(amount) + " withdrawn successfully"));
+            return 200;
         }
     }
 }

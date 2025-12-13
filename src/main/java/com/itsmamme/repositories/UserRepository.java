@@ -32,32 +32,65 @@ public final class UserRepository {
         return users.containsKey(key(username));
     }
 
-    public static void save(User user) {
+    public static boolean accountNumberExist(String accountNumber) {
+        for (User user : users.values()) {
+            if (user.account.getAccountNumber().equals(accountNumber))
+                return true;
+        }
+
+        return false;
+    }
+
+    public static void save(User user, boolean showLog) {
         if (user == null)
             return;
         users.put(key(user.getUsername()), user);
-        sync();
+        sync(showLog);
     }
 
-    public static void delete(String username) {
+    public static void delete(String username, boolean showLog) {
         if (!exist(username))
             return;
 
         users.remove(key(username));
-        sync();
+        sync(showLog);
+    }
+
+    public static void patch(String username, User user, boolean showLog) {
+        if (!exist(username))
+            return;
+
+        users.replace(username, user);
+        sync(showLog);
     }
 
     public static User getUser(String username) {
         return users.get(key(username));
     }
 
+    public static User getUserByAccNumber(String accountNumber) {
+        for (User user : users.values()) {
+            if (user.account.getAccountNumber().equals(accountNumber)) {
+                return getUser(user.getUsername());
+            }
+        }
+
+        return null;
+    }
+
     public static Map<String, User> getUsers() {
         return users;
     }
 
-    public static void sync() {
+    public static void setCurrentUser(User user) {
+        currentUser = user;
+    }
+
+    public static void sync(boolean showLog) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_FILE))) {
-            System.out.println(Message.process("Syncing repository"));
+
+            if (showLog)
+                System.out.println(Message.process("Syncing repository"));
             for (User user : users.values()) {
                 bw.write(user.getFirstName() + "," +
                         user.getLastName() + "," +
@@ -72,11 +105,12 @@ public final class UserRepository {
                 bw.newLine();
             }
         } catch (IOException e) {
-            System.out.println(Message.error("Failed to sync repository"));
+            if (showLog)
+                System.out.println(Message.error("Failed to sync repository"));
         }
     }
 
-    public static void init() {
+    public static void init(boolean showLog) {
         if (!USERS_FILE.exists()) {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_FILE))) {
                 bw.write("admin,admin,0,MALE,ADMIN,admin,admin,NULL,0,1");
@@ -89,7 +123,9 @@ public final class UserRepository {
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
-            System.out.println(Message.process("Initializing repository"));
+
+            if (showLog)
+                System.out.println(Message.process("Initializing repository"));
             String line;
 
             while ((line = br.readLine()) != null) {
@@ -119,8 +155,8 @@ public final class UserRepository {
                 users.put(key(username), user);
             }
         } catch (IOException e) {
-            System.out.println(Message.error("Failed to initialize repository"));
+            if (showLog)
+                System.out.println(Message.error("Failed to initialize repository"));
         }
     }
-
 }

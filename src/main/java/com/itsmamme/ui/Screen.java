@@ -15,6 +15,19 @@ public final class Screen {
     private Screen() {
     }
 
+    public static void pathHeader(String[] path) {
+        System.out.println();
+        System.out.println(Terminal.path(path));
+        System.out.println(Terminal.decorator.separator());
+    }
+
+    public static void listChoices(String[] choices) {
+        for (int i = 0; i < choices.length; i++) {
+            System.out.println(Text.color.mute((i + 1) + ".") + choices[i]);
+        }
+        System.out.print(Message.request(Text.color.mute("choose (1-" + choices.length + ")")));
+    }
+
     public static void home() {
         String[] choices = {
                 "login",
@@ -27,11 +40,8 @@ public final class Screen {
         System.out.println(Text.style.bold(Text.color.blue("WELCOME TO BANKING SYSTEM")));
         System.out.println(Terminal.decorator.separator());
 
-        for (int i = 0; i < choices.length; i++) {
-            System.out.println(Text.color.mute((i + 1) + ".") + choices[i]);
-        }
+        listChoices(choices);
 
-        System.out.print(Message.request(Text.color.mute("choose (1-" + choices.length + ")")));
     }
 
     public static void dashboard(User user) {
@@ -72,12 +82,7 @@ public final class Screen {
             System.out.println(Terminal.decorator.separator());
         }
 
-        for (int i = 0; i < choices.length; i++) {
-            System.out.println(Text.color.mute((i + 1) + ".") + choices[i]);
-        }
-
-        System.out.print(Message.request(Text.color.mute("choose (1-" + choices.length + ")")));
-
+        listChoices(choices);
     }
 
     public static void transact(Transaction transactionType, User user) {
@@ -105,19 +110,12 @@ public final class Screen {
             };
         }
 
-        System.out.println();
-        System.out.println(Terminal.path(path));
-        System.out.println(Terminal.decorator.separator());
+        pathHeader(path);
+
         if (transactionType != Transaction.DEPOSIT) {
             System.out.println(Text.color.blue("◉") + " BALANCE " + Text.color
                     .green("$" + NumberFormat.getNumberInstance(Locale.US).format(user.account.getBalance())));
             System.out.println(Terminal.decorator.separator());
-        }
-
-        if (transactionType != Transaction.TRANSFER) {
-            System.out.print(Message.request("Enter amount"));
-        } else {
-            System.out.print(Message.request("Enter account number"));
         }
     }
 
@@ -137,14 +135,7 @@ public final class Screen {
                 "back"
         };
 
-        System.out.println();
-        System.out.println(Terminal.path(path));
-        System.out.println(Terminal.decorator.separator());
-
-        for (int i = 0; i < choices.length; i++) {
-            System.out.println(Text.color.mute((i + 1) + ".") + choices[i]);
-        }
-
-        System.out.print(Message.request(Text.color.mute("choose (1-" + choices.length + ")")));
+        pathHeader(path);
+        listChoices(choices);
     }
 }
