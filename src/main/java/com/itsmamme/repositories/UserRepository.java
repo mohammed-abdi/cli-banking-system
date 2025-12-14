@@ -12,6 +12,7 @@ import java.util.Map;
 import com.itsmamme.enums.Gender;
 import com.itsmamme.enums.Role;
 import com.itsmamme.models.User;
+import com.itsmamme.services.Auth;
 import com.itsmamme.utils.Message;
 import com.itsmamme.utils.Text;
 
@@ -100,7 +101,7 @@ public final class UserRepository {
                         user.getUsername() + "," +
                         user.getPassword() + "," +
                         user.account.getAccountNumber() + "," +
-                        user.account.getBalance() + ",0");
+                        user.account.getBalance() + ",false");
 
                 bw.newLine();
             }
@@ -113,13 +114,13 @@ public final class UserRepository {
     public static void init(boolean showLog) {
         if (!USERS_FILE.exists()) {
             try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_FILE))) {
-                bw.write("admin,admin,0,MALE,ADMIN,admin,admin,NULL,0,1");
+                bw.write("admin,admin,0,MALE,ADMIN,admin," + Auth.hashPassword("admin") + ",NULL,0,false");
                 bw.newLine();
             } catch (IOException e) {
                 System.out.println(
                         Message.error("Failed to initialize " + Text.style.underline(Text.color.blue("users.txt"))));
+                return;
             }
-            return;
         }
 
         try (BufferedReader br = new BufferedReader(new FileReader(USERS_FILE))) {
@@ -149,9 +150,10 @@ public final class UserRepository {
                 String password = parts[6];
                 String accountNumber = parts[7];
                 double balance = Double.parseDouble(parts[8]);
+                boolean hashPassword = Boolean.valueOf(parts[9]);
 
                 User user = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
-                        false);
+                        hashPassword);
                 users.put(key(username), user);
             }
         } catch (IOException e) {
