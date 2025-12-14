@@ -48,4 +48,8 @@ public class Account extends Policy {
             return 200;
         }
     }
+
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 }

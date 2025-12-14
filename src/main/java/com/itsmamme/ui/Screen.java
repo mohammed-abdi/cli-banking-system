@@ -133,8 +133,8 @@ public final class Screen {
                                 "view info",
                                 "edit name",
                                 "edit age",
-                                "edit gender",
-                                "edit username",
+                                "change gender",
+                                "change username",
                                 "change password",
                                 "back"
                 };

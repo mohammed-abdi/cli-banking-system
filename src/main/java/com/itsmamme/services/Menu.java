@@ -31,10 +31,10 @@ public final class Menu {
                     Prompt.createUser();
                     break;
                 case 2:
-                    // search user
+                    Prompt.searchUser();
                     break;
                 case 3:
-                    // list users
+                    Prompt.listUsers();
                     break;
                 case 4:
                     // transactions
@@ -78,7 +78,7 @@ public final class Menu {
                     // transactions
                     break;
                 case 5:
-                    // settings
+                    Prompt.settings(user);
                     break;
                 case 6:
                     Prompt.logout(user.getUsername());

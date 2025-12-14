@@ -7,9 +7,9 @@ import com.itsmamme.services.Menu;
 
 public class App {
     public static void main(String[] args) {
-        UserRepository.init(true);
+        UserRepository.init();
 
-        while (Menu.auth()) {
+        while (true) {
             User currentUser = UserRepository.currentUser;
             boolean userAuthenticated = currentUser != null;
             boolean isAdmin = userAuthenticated ? currentUser.getRole() == Role.ADMIN : false;
@@ -21,6 +21,10 @@ public class App {
                 } else {
                     Menu.user(currentUser);
                 }
+            } else {
+                boolean sessionOngoing = Menu.auth();
+                if (!sessionOngoing)
+                    break;
             }
         }
     }

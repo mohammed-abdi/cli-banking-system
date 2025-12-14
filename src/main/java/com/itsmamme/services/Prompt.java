@@ -1,6 +1,7 @@
 package com.itsmamme.services;
 
 import java.text.NumberFormat;
+import java.util.InputMismatchException;
 import java.util.Locale;
 import java.util.Scanner;
 
@@ -21,8 +22,8 @@ public final class Prompt extends Policy {
     private Prompt() {
     }
 
-    public static void delay() {
-        Terminal.delay(1000);
+    public static void unexpectedError() {
+        System.out.println(Message.error("An unexpected error occurred. Please try again"));
     }
 
     public static boolean confirm(String message) {
@@ -48,7 +49,6 @@ public final class Prompt extends Policy {
         while (true) {
             if (attempts == 0) {
                 System.out.println(Message.process("Redirecting to homepage"));
-                delay();
                 break;
             }
 
@@ -60,7 +60,6 @@ public final class Prompt extends Policy {
             if (Auth.login(username, password)) {
                 System.out.println(Message.success("Logged in successfully"));
                 System.out.println(Message.process("Redirecting to dashboard"));
-                delay();
                 break;
             } else {
                 System.out.println(Message.error("Incorrect username or password"));
@@ -86,7 +85,6 @@ public final class Prompt extends Policy {
         if (confirm("logout as " + Text.style.underline(Text.color.blue(username)))) {
             System.out.println(Message.process("Logging out"));
             Auth.logout();
-            delay();
         }
     }
 
@@ -280,27 +278,12 @@ public final class Prompt extends Policy {
         System.out.print(Message.request("last name"));
         String lastName = scanner.next().trim();
 
-        int age = user.getAge();
-        Gender gender = user.getGender();
-        Role role = user.getRole();
-        String username = user.getUsername();
-        String password = user.getPassword();
-        String accountNumber = user.account.getAccountNumber();
-        double balance = user.account.getBalance();
-
-        UserRepository.currentUser.setFirstName(firstName);
-        UserRepository.currentUser.setLastName(lastName);
-
-        User currentUser = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
-                false);
-
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
         System.out.println(Message.success("Name changed to " + Text.style.underline(Text.color
                 .blue(Text.normalizeCapitalization(firstName) + " " + Text.normalizeCapitalization(lastName)))
                 + " successfully"));
-
-        boolean showLog = user.getRole() == Role.ADMIN ? true : false;
-        UserRepository.patch(user.getUsername(), currentUser, showLog);
-        delay();
+        UserRepository.sync();
     }
 
     public static void editAge(User user) {
@@ -330,29 +313,37 @@ public final class Prompt extends Policy {
             }
         }
 
-        String firstName = user.getFirstName();
-        String lastName = user.getLastName();
-        Gender gender = user.getGender();
-        Role role = user.getRole();
-        String username = user.getUsername();
-        String password = user.getPassword();
-        String accountNumber = user.account.getAccountNumber();
-        double balance = user.account.getBalance();
         int prevAge = user.getAge();
-
-        UserRepository.currentUser.setAge(age);
-
-        User currentUser = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
-                false);
+        user.setAge(age);
 
         System.out.println(Message
-                .success("Age changed " + Text.color.mute(String.valueOf(prevAge)) + " " + Terminal.symbol.RIGHT_ARROW
+                .success("Age changed " + Text.color.mute(String.valueOf(prevAge)) + " "
+                        + Terminal.symbol.RIGHT_ARROW
                         + " "
                         + Text.color.blue(String.valueOf(age)) + " successfully"));
+        UserRepository.sync();
 
-        boolean showLog = user.getRole() == Role.ADMIN ? true : false;
-        UserRepository.patch(user.getUsername(), currentUser, showLog);
-        delay();
+    }
+
+    public static void changeGender(User user) {
+        String[] path = {
+                "home",
+                "dashboard",
+                "settings",
+                "gender"
+        };
+
+        Screen.pathHeader(path);
+        System.out.println(Text.color.mute(Terminal.symbol.RIGHT_ARROW + " current gender: ")
+                + Text.style.underline(Text.color.blue(String.valueOf(user.getGender()))));
+        System.out.println(Terminal.decorator.separator());
+
+        boolean genderChoice = confirm("male");
+        Gender gender = genderChoice ? Gender.MALE : Gender.FEMALE;
+
+        user.setGender(gender);
+        System.out.println(Message.success("Gender changed successfully"));
+        UserRepository.sync();
     }
 
     public static void changeUsername(User user) {
@@ -380,25 +371,18 @@ public final class Prompt extends Policy {
             System.out.println(Terminal.decorator.separator());
         }
 
-        String firstName = user.getFirstName();
-        String lastName = user.getLastName();
-        int age = user.getAge();
-        Gender gender = user.getGender();
-        Role role = user.getRole();
-        String password = user.getPassword();
-        String accountNumber = user.account.getAccountNumber();
-        double balance = user.account.getBalance();
+        String prevUsername = user.getUsername();
 
-        UserRepository.currentUser.setUsername(username);
+        if (UserRepository.changeKey(prevUsername, username)) {
+            System.out.println(Message
+                    .success("Username changed to " + Text.style.underline(Text.color.blue(username))
+                            + " successfully"));
+            UserRepository.setCurrentUser(user);
+            UserRepository.sync();
+        } else {
+            unexpectedError();
+        }
 
-        User currentUser = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
-                false);
-        System.out.println(Message
-                .success("Username changed to " + Text.style.underline(Text.color.blue(username)) + " successfully"));
-        boolean showLog = user.getRole() == Role.ADMIN ? true : false;
-        UserRepository.patch(user.getUsername(), currentUser, showLog);
-        UserRepository.sync(showLog);
-        delay();
     }
 
     public static void changePassword(User user) {
@@ -420,6 +404,7 @@ public final class Prompt extends Policy {
 
         System.out.println(Terminal.decorator.separator());
         String password;
+
         while (true) {
             System.out.print(Message.request("new password"));
             String newPassword = scanner.next().trim();
@@ -435,23 +420,173 @@ public final class Prompt extends Policy {
             System.out.println(Terminal.decorator.separator());
         }
 
-        String firstName = user.getFirstName();
-        String lastName = user.getLastName();
-        int age = user.getAge();
-        Gender gender = user.getGender();
-        Role role = user.getRole();
-        String username = user.getUsername();
-        String accountNumber = user.account.getAccountNumber();
-        double balance = user.account.getBalance();
-
-        UserRepository.currentUser.setPassword(password, true);
-
-        User currentUser = new User(firstName, lastName, age, gender, role, username, password, accountNumber, balance,
-                true);
+        user.setPassword(password, true);
         System.out.println(Message.success("Password changed successfully"));
-        boolean showLog = user.getRole() == Role.ADMIN ? true : false;
-        UserRepository.patch(user.getUsername(), currentUser, showLog);
-        delay();
+        UserRepository.sync();
+    }
+
+    public static void listUsers() {
+
+        User[] users = UserRepository.getUsers();
+
+        String targetElement = "users" + Text.color.mute(" (" + String.valueOf(users.length) + ")");
+
+        String[] path = {
+                "home",
+                "dashboard",
+                targetElement
+        };
+
+        Screen.pathHeader(path);
+        for (User user : users) {
+            userInfo(user);
+            System.out.println(Terminal.decorator.separator());
+        }
+    }
+
+    public static void settings(User user) {
+        while (true) {
+            Screen.settings();
+            int choice;
+
+            try {
+                choice = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println(Message.error("Please enter a number "));
+                scanner.nextLine();
+                continue;
+            }
+
+            switch (choice) {
+                case 1:
+                    viewInfo(user);
+                    break;
+                case 2:
+                    editName(user);
+                    break;
+                case 3:
+                    editAge(user);
+                    break;
+                case 4:
+                    changeGender(user);
+                    break;
+                case 5:
+                    changeUsername(user);
+                    System.out.println(Message.process("Redirecting to dashboard"));
+                    return;
+                case 6:
+                    changePassword(user);
+                    break;
+                case 7:
+                    System.out.println(Message.process("Redirecting to dashboard"));
+                    return;
+                default:
+                    unexpectedError();
+                    break;
+            }
+
+        }
+    }
+
+    public static void searchUser() {
+
+        String[] path = {
+                "home",
+                "dashboard",
+                "search"
+        };
+
+        String[] choices = {
+                "edit name",
+                "edit age",
+                "change gender",
+                "change username",
+                "change password",
+                "delete user",
+                "back"
+        };
+
+        Screen.pathHeader(path);
+
+        while (true) {
+            System.out.print(Message.request("Username"));
+            String username = scanner.next();
+
+            User user = UserRepository.getUser(username);
+
+            if (user != null) {
+                boolean confirmed = confirm("User found: " + Text.style.underline(
+                        Text.color.blue(user.getFirstName() + " " + user.getLastName()) + ". Continue"));
+
+                if (!confirmed)
+                    continue;
+
+                while (true) {
+                    user = UserRepository.getUser(username);
+                    String[] userPath = {
+                            "home",
+                            "dashboard",
+                            "users",
+                            user.getUsername()
+                    };
+
+                    Screen.pathHeader(userPath);
+                    userInfo(user);
+                    System.out.println(Terminal.decorator.separator());
+                    Screen.listChoices(choices);
+
+                    int choice;
+
+                    try {
+                        choice = scanner.nextInt();
+                    } catch (InputMismatchException e) {
+                        System.out.println(Message.error("Please enter a number"));
+                        scanner.nextLine();
+                        continue;
+                    }
+
+                    switch (choice) {
+                        case 1:
+                            editName(user);
+                            break;
+                        case 2:
+                            editAge(user);
+                            break;
+                        case 3:
+                            changeGender(user);
+                            break;
+                        case 4:
+                            changeUsername(user);
+                            System.out.println(Message.process("Redirecting to dashboard"));
+                            return;
+                        case 5:
+                            changePassword(user);
+                            break;
+                        case 6:
+                            if (!confirm("Are you sure you want to delete " + Text.style
+                                    .underline(Text.color.blue(user.getFirstName() + " " + user.getLastName()))))
+                                break;
+                            if (!UserRepository.delete(username))
+                                return;
+                            System.out.println(Message.success("User deleted successfully"));
+                            System.out.println(Message.process("Redirecting to dashboard"));
+                            return;
+                        case 7:
+                            System.out.println(Message.process("Redirecting to dashboard"));
+                            return;
+                        default:
+                            unexpectedError();
+                            break;
+                    }
+                }
+
+            } else {
+                System.out.println(Message.error(
+                        "User with username " + Text.style.underline(Text.color.blue(username)) + " was not found"));
+                break;
+            }
+
+        }
     }
 
     public static void deposit(User user) {
@@ -462,14 +597,13 @@ public final class Prompt extends Policy {
             System.out.print(Message.request("Enter amount"));
             try {
                 amount = scanner.nextDouble();
-            } catch (Exception e) {
-                amount = -1;
-                System.out.println(Message.error("An unexpected error occurred. Please try again"));
-                break depositLoop;
+            } catch (InputMismatchException e) {
+                System.out.println(Message.error("Please enter a number"));
+                scanner.nextLine();
+                continue;
             }
 
-            User currentUser = UserRepository.getUser(user.getUsername());
-            int statusCode = currentUser.account.deposit(amount);
+            int statusCode = user.account.deposit(amount);
 
             switch (statusCode) {
                 case 400:
@@ -492,13 +626,12 @@ public final class Prompt extends Policy {
                     System.out.println(Message.success(
                             "$" + NumberFormat.getNumberInstance(Locale.US).format(amount)
                                     + " deposited successfully"));
-                    UserRepository.patch(currentUser.getUsername(), currentUser, false);
-                    UserRepository.setCurrentUser(currentUser);
-                    Terminal.delay(1000);
+
+                    UserRepository.sync();
                     break depositLoop;
 
                 default:
-                    System.out.println(Message.error("An unexpected error occurred. Please try again"));
+                    unexpectedError();
                     break;
             }
         }
@@ -512,14 +645,13 @@ public final class Prompt extends Policy {
             System.out.print(Message.request("Enter amount"));
             try {
                 amount = scanner.nextDouble();
-            } catch (Exception e) {
-                amount = -1;
-                System.out.println(Message.error("An unexpected error occurred. Please try again"));
-                break withdrawLoop;
+            } catch (InputMismatchException e) {
+                System.out.println(Message.error("Please enter a number"));
+                scanner.nextLine();
+                continue;
             }
 
-            User currentUser = UserRepository.getUser(user.getUsername());
-            int statusCode = currentUser.account.withdraw(amount);
+            int statusCode = user.account.withdraw(amount);
 
             switch (statusCode) {
                 case 400:
@@ -546,13 +678,11 @@ public final class Prompt extends Policy {
                     System.out.println(Message.success(
                             "$" + NumberFormat.getNumberInstance(Locale.US).format(amount)
                                     + " withdrawn successfully"));
-                    UserRepository.patch(currentUser.getUsername(), currentUser, false);
-                    UserRepository.setCurrentUser(currentUser);
-                    Terminal.delay(1000);
+                    UserRepository.sync();
                     break withdrawLoop;
 
                 default:
-                    System.out.println(Message.error("An unexpected error occurred. Please try again"));
+                    unexpectedError();
                     break;
             }
         }
@@ -589,16 +719,17 @@ public final class Prompt extends Policy {
             System.out.print(Message.request("Enter amount"));
             try {
                 amount = scanner.nextDouble();
-            } catch (Exception e) {
-                amount = -1;
-                System.out.println(Message.error("An unexpected error occurred. Please try again"));
-                break transferLoop;
+            } catch (InputMismatchException e) {
+                System.out.println(Message.error("Please enter a number"));
+                scanner.nextLine();
+                continue;
             }
 
-            User currentUser = UserRepository.getUser(user.getUsername());
+            User sender = UserRepository.getUser(user.getUsername());
 
-            int receiverStatusCode = receiver.account.deposit(amount);
-            int senderStatusCode = currentUser.account.withdraw(amount);
+            double senderBalanceBefore = sender.account.getBalance();
+
+            int senderStatusCode = sender.account.withdraw(amount);
 
             switch (senderStatusCode) {
                 case 400:
@@ -622,22 +753,25 @@ public final class Prompt extends Policy {
                     break;
 
                 case 200:
-                    if (receiverStatusCode != senderStatusCode)
+                    int receiverStatusCode = receiver.account.deposit(amount);
+
+                    if (receiverStatusCode != 200) {
+                        sender.account.setBalance(senderBalanceBefore);
+                        System.out.println(Message.error("Transfer failed. Changes were rolled back"));
                         break transferLoop;
+                    }
+
                     System.out.println(Message.success(
                             "$" + NumberFormat.getNumberInstance(Locale.US).format(amount)
                                     + " is transferred to "
                                     + Text.style.underline(
                                             Text.color.blue(receiver.getFirstName() + " " + receiver.getLastName()))
                                     + " successfully"));
-                    UserRepository.patch(currentUser.getUsername(), currentUser, false);
-                    UserRepository.patch(receiver.getUsername(), receiver, false);
-                    UserRepository.setCurrentUser(currentUser);
-                    Terminal.delay(1000);
+                    UserRepository.sync();
                     break transferLoop;
 
                 default:
-                    System.out.println(Message.error("An unexpected error occurred. Please try again"));
+                    unexpectedError();
                     break;
             }
         }
