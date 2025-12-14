@@ -49,7 +49,7 @@ public final class Prompt extends Policy {
             if (attempts == 0) {
                 System.out.println(Message.process("Redirecting to homepage"));
                 delay();
-                return;
+                break;
             }
 
             System.out.print(Message.request("username"));
@@ -59,10 +59,9 @@ public final class Prompt extends Policy {
 
             if (Auth.login(username, password)) {
                 System.out.println(Message.success("Logged in successfully"));
-                Terminal.delay(300);
                 System.out.println(Message.process("Redirecting to dashboard"));
                 delay();
-                return;
+                break;
             } else {
                 System.out.println(Message.error("Incorrect username or password"));
                 if (attempts > 1)
