@@ -1,44 +1,55 @@
 # BANKING SYSTEM
 
-A lightweight, role-based CLI banking application with user accounts, balance management, and administrative controls.
+A lightweight, role-based CLI banking application with user accounts, balance management, and transaction history tracking.
 
 ## About
 
-This project is a simple, text-based banking system built in Java 17+. It simulates essential banking operations through a clean console interface, supporting both regular users and administrators. Users can manage their own accounts, perform financial operations, and review transaction history, while administrators can manage system-wide data such as user accounts and transaction logs.
+This project is a simple, text-based banking system built in **Java 17+**. It simulates essential banking operations through a clean console interface, supporting both regular users and administrators.
 
-The application focuses on clarity, separation of concerns, and maintainable structure by organizing screens, utilities, services, and repositories into dedicated, modular components.
+Users can manage their own accounts, perform financial operations, and review their personal transaction history, while administrators can manage system-wide data such as user accounts and full transaction history.
+
+The application emphasizes **clarity, separation of concerns, and maintainability**, with a modular structure that cleanly separates models, repositories, UI prompts, utilities, and core logic.
 
 ## Features
 
 ### User Features
-- Secure authentication with a role-based dashboard
-- Balance overview with formatted, color-coded display
-- Deposit and withdrawal operations
-- User profile management (view info, update name, change password)
-- Personal transaction history
+- Secure authentication with role-based dashboards
+- Balance overview with formatted, color-coded output
+- Deposit, withdrawal, and transfer operations
+- User profile management:
+  - View account info
+  - Edit name and age
+  - Change gender
+  - Change username
+  - Change password
+- Personal transaction history (read-only)
 
 ### Admin Features
 - Add, remove, search, and list users
-- Access full system transaction logs
 - View and manage any user account
+- Access full system transaction history
+- Role-aware access to sensitive operations
 
 ### General
+- Immutable transaction history records with unique IDs
+- Append-only transaction tracking with file-based persistence
 - Styled console interface for readable, structured output
-- Clean menu navigation and predictable UI layout
+- Clean menu navigation and predictable UI flows
 
 ## Specifications
 
 - **Language:** `Java 17+`
 - **Build Tool:** `Maven 3.8+`
 - **Interface:** `Text-based CLI with ANSI-styled colored output`
-- **Architecture:** `Modular design separating services, models, ui, repositories, and utils`
-- **Storage:** `File-based persistence for users, and transactions`
+- **Architecture:** `Modular design separating models, repositories, ui, and utils`
+- **Storage:** `File-based persistence for users and transaction history`
 - **Security:** `BCrypt for password hashing and validation`
-- **Design Principles:** `Clean separation of concerns, readable code, maintainability, and predictable user flows`
+- **Design Principles:**  
+  `Immutability where possible, clear domain boundaries, separation of concerns, and maintainable code`
 
 ## Prerequisites
 
-Make sure you have the following installed before running the project:
+Ensure the following are installed before running the project:
 
 - **Java 17 or higher**  
   Required to compile and run the application.
@@ -50,16 +61,15 @@ Make sure you have the following installed before running the project:
   For cloning the repository.
 
 - **ANSI-compatible terminal**  
-  To correctly display colors and styled text.
+  Required for proper rendering of colors and styled text.
 
 > (Optional)
-- **An IDE with Maven support**  
-  VS Code, IntelliJ IDEA, or Eclipse recommended for development.
+- **IDE with Maven support**  
+  IntelliJ IDEA, VS Code, or Eclipse recommended.
 
 ## Installation
 
-
-#### Clone Repository
+### Clone Repository
 
 ```bash
 git clone https://github.com/mohammed-abdi/cli-banking-system.git
