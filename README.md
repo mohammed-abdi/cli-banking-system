@@ -12,29 +12,46 @@ The application emphasizes **clarity, separation of concerns, and maintainabilit
 
 ## Features
 
-### User Features
-- Secure authentication with role-based dashboards
-- Balance overview with formatted, color-coded output
-- Deposit, withdrawal, and transfer operations
-- User profile management:
+### User Features (`Role.USER`)
+Users are presented with a focused, self-service menu:
+
+- Deposit funds
+- Withdraw funds
+- Transfer funds to another user
+- View personal transaction history (read-only)
+- Manage account settings:
   - View account info
   - Edit name and age
   - Change gender
   - Change username
   - Change password
-- Personal transaction history (read-only)
+- Logout
 
-### Admin Features
-- Add, remove, search, and list users
-- View and manage any user account
-- Access full system transaction history
-- Role-aware access to sensitive operations
+> Users can only access **their own data and transaction history**.
+
+---
+
+### Admin Features (`Role.ADMIN`)
+Administrators operate with elevated privileges and system visibility:
+
+- Create new users
+- Search and manage any user
+- List all users
+- View full system transaction history
+- Logout
+
+> Admins have **read-only access to all transaction history** and full control over user management.
+
+---
 
 ### General
 - Immutable transaction history records with unique IDs
 - Append-only transaction tracking with file-based persistence
+- Role-aware menus and access control
 - Styled console interface for readable, structured output
 - Clean menu navigation and predictable UI flows
+
+---
 
 ## Specifications
 
@@ -75,7 +92,12 @@ Ensure the following are installed before running the project:
 git clone https://github.com/mohammed-abdi/cli-banking-system.git
 cd cli-banking-system
 ```
+### Build and Run
 
+```bash
+mvn clearn package
+java -jar target/cli-banking-system.jar
+```
 ### License
 
 This project is licensed under the MIT License. See [LICENSE](./LICENSE) for details.
