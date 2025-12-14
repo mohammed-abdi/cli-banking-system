@@ -77,29 +77,38 @@ public final class Terminal {
             return Text.color.mute(line(DEFAULT_SEPARATOR_LENGTH));
         }
 
-        public static String tableCorner(Side side) {
+        public static String tableGlyph(Side side) {
             switch (side) {
-                case TOP_RIGHT:
-                    return "┐";
-                case TOP_LEFT:
+                case TOP_LEFT_CORNER:
                     return "┌";
-                case TOP_CENTER:
-                    return "┬";
-                case BOTTOM_CENTER:
-                    return "┴";
-                case CENTER:
-                    return "│";
-                case LEFT_CENTER:
-                    return "├";
-                case RIGHT_CENTER:
-                    return "┤";
-                case BOTTOM_RIGHT:
-                    return "┘";
-                case BOTTOM_LEFT:
+                case TOP_RIGHT_CORNER:
+                    return "┐";
+                case BOTTOM_LEFT_CORNER:
                     return "└";
+                case BOTTOM_RIGHT_CORNER:
+                    return "┘";
+
+                case TOP_JUNCTION:
+                    return "┬";
+                case BOTTOM_JUNCTION:
+                    return "┴";
+                case LEFT_JUNCTION:
+                    return "├";
+                case RIGHT_JUNCTION:
+                    return "┤";
+
+                case CROSS_JUNCTION:
+                    return "┼";
+
+                case VERTICAL_LINE:
+                    return "│";
+                case HORIZONTAL_LINE:
+                    return "─";
+
                 default:
                     return "?";
             }
+
         }
 
     }

@@ -4,6 +4,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import com.itsmamme.enums.Role;
+import com.itsmamme.enums.Side;
 import com.itsmamme.enums.Transaction;
 import com.itsmamme.models.User;
 import com.itsmamme.utils.Message;
@@ -137,5 +138,68 @@ public final class Screen {
 
         pathHeader(path);
         listChoices(choices);
+    }
+
+    public static void about() {
+        System.out.println();
+        System.out.println(Text.style.bold(Text.color.blue("BANKING SYSTEM")));
+        System.out.println(
+                "A lightweight, role-based CLI banking application with user accounts,\nbalance management, and administrative controls.");
+        System.out.println(Text.style.underline(Text.color.blue("Contributors")));
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.TOP_LEFT_CORNER))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.TOP_JUNCTION))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.TOP_RIGHT_CORNER)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)) + " "
+                        + Text.color.blue("NAME                    ")
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE))
+                        + Text.color.blue(" DDU ID                  ")
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.LEFT_JUNCTION))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.CROSS_JUNCTION))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.RIGHT_JUNCTION)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)) + " MOHAMMED ABDI ("
+                        + Text.color.blue("Lead") + ")    "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE))
+                        + " DDU1600554              "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)) + " ABDULFETAH IBRAHIM      "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE))
+                        + " DDU1600029              "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)) + " SENA ALEMAYEHU          "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE))
+                        + " DDU1600663              "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)) + " ADNAN MOHAMMED          "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE))
+                        + " DDU1601164              "
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.VERTICAL_LINE)));
+
+        System.out.println(
+                Text.color.mute(Terminal.decorator.tableGlyph(Side.BOTTOM_LEFT_CORNER))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.BOTTOM_JUNCTION))
+                        + Terminal.decorator.line(25)
+                        + Text.color.mute(Terminal.decorator.tableGlyph(Side.BOTTOM_RIGHT_CORNER)));
+
+        System.out.println(Message.info(Text.color.mute("Submission Date: ") + Text.color.blue("DD/MM/YY")));
+        System.out.println(Message.info(Text.color.mute("Submitted To: ") + Text.color.blue("Lec. Mikiyas M.")));
     }
 }
