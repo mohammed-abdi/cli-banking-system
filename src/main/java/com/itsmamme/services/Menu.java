@@ -37,7 +37,7 @@ public final class Menu {
                     Prompt.listUsers();
                     break;
                 case 4:
-                    // transactions
+                    Prompt.transactions(user);
                     break;
                 case 5:
                     Prompt.logout(user.getUsername());
@@ -75,7 +75,7 @@ public final class Menu {
                     Prompt.transfer(user);
                     break;
                 case 4:
-                    // transactions
+                    Prompt.transactions(user);
                     break;
                 case 5:
                     Prompt.settings(user);
