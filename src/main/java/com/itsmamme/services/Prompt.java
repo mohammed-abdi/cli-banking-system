@@ -1,14 +1,18 @@
 package com.itsmamme.services;
 
 import java.text.NumberFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.InputMismatchException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 
 import com.itsmamme.enums.Gender;
 import com.itsmamme.enums.Role;
 import com.itsmamme.enums.Transaction;
+import com.itsmamme.models.TransactionHistory;
 import com.itsmamme.models.User;
+import com.itsmamme.repositories.TransactionHistoryRepository;
 import com.itsmamme.repositories.UserRepository;
 import com.itsmamme.ui.Screen;
 import com.itsmamme.utils.Message;
@@ -18,6 +22,7 @@ import com.itsmamme.utils.Text;
 
 public final class Prompt extends Policy {
     private static final Scanner scanner = new Scanner(System.in);
+    private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private Prompt() {
     }
@@ -429,7 +434,7 @@ public final class Prompt extends Policy {
 
         User[] users = UserRepository.getUsers();
 
-        String targetElement = "users" + Text.color.mute(" (" + String.valueOf(users.length) + ")");
+        String targetElement = "users" + Text.color.mute("(" + String.valueOf(users.length) + ")");
 
         String[] path = {
                 "home",
@@ -626,7 +631,8 @@ public final class Prompt extends Policy {
                     System.out.println(Message.success(
                             "$" + NumberFormat.getNumberInstance(Locale.US).format(amount)
                                     + " deposited successfully"));
-
+                    TransactionHistoryRepository.save(user.getUsername(), null, amount, Transaction.DEPOSIT);
+                    TransactionHistoryRepository.sync();
                     UserRepository.sync();
                     break depositLoop;
 
@@ -678,6 +684,8 @@ public final class Prompt extends Policy {
                     System.out.println(Message.success(
                             "$" + NumberFormat.getNumberInstance(Locale.US).format(amount)
                                     + " withdrawn successfully"));
+                    TransactionHistoryRepository.save(user.getUsername(), null, amount, Transaction.WITHDRAW);
+                    TransactionHistoryRepository.sync();
                     UserRepository.sync();
                     break withdrawLoop;
 
@@ -767,12 +775,94 @@ public final class Prompt extends Policy {
                                     + Text.style.underline(
                                             Text.color.blue(receiver.getFirstName() + " " + receiver.getLastName()))
                                     + " successfully"));
+                    TransactionHistoryRepository.save(sender.getUsername(), receiver.getUsername(), amount,
+                            Transaction.TRANSFER);
+                    TransactionHistoryRepository.sync();
                     UserRepository.sync();
                     break transferLoop;
 
                 default:
                     unexpectedError();
                     break;
+            }
+        }
+    }
+
+    public static void transactions(User user) {
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        List<TransactionHistory> transactionHistories = TransactionHistoryRepository.getTransactionHistories(user);
+
+        String targetElement = "transactions"
+                + Text.color.mute("(" + String.valueOf(transactionHistories.size()) + ")");
+
+        String[] path = {
+                "home",
+                "dashboard",
+                targetElement
+        };
+
+        Screen.pathHeader(path);
+
+        if (transactionHistories.size() == 0) {
+            System.out.println(Message.info("Transaction histories appear here"));
+            return;
+        }
+
+        List<TransactionHistory> reversedTransactionHistories = transactionHistories.reversed();
+
+        for (TransactionHistory transactionHistory : reversedTransactionHistories) {
+            String icon;
+            String action;
+            String amount;
+
+            switch (transactionHistory.getTransactionType()) {
+                case DEPOSIT:
+                    icon = Text.color.green(Terminal.symbol.DOWNWARD_ARROW);
+                    action = "deposited";
+                    amount = Text.color
+                            .green("$"
+                                    + NumberFormat.getNumberInstance(Locale.US).format(transactionHistory.getAmount()));
+                    break;
+                case WITHDRAW:
+                    icon = Text.color.red(Terminal.symbol.UPWARD_ARROW);
+                    action = "withdrawn";
+                    amount = Text.color
+                            .red("$" + NumberFormat.getNumberInstance(Locale.US)
+                                    .format(transactionHistory.getAmount()));
+                    break;
+                case TRANSFER:
+                    icon = Text.color.blue(Terminal.symbol.UPWARD_ARROW);
+                    action = "transferred";
+                    amount = Text.color
+                            .blue("$"
+                                    + NumberFormat.getNumberInstance(Locale.US).format(transactionHistory.getAmount()));
+                    break;
+                default:
+                    icon = Terminal.symbol.TILDE;
+                    action = "performed-unknown-action";
+                    amount = Text.color
+                            .mute("$"
+                                    + NumberFormat.getNumberInstance(Locale.US).format(transactionHistory.getAmount()));
+                    break;
+            }
+
+            if (isAdmin) {
+                System.out.println(Text.color.mute(String.valueOf(transactionHistory.getTimestamp().format(formatter)))
+                        + " " + icon + " "
+                        + Text.style.underline(Text.color.blue(transactionHistory.getFromAccount())) + " " + action
+                        + " "
+                        + amount + " "
+                        + (transactionHistory.getTransactionType() == Transaction.TRANSFER
+                                ? "to " + Text.style.underline(Text.color.blue(transactionHistory.getToAccount()))
+                                : ""));
+            } else {
+                System.out.println(Text.color.mute(String.valueOf(transactionHistory.getTimestamp().format(formatter)))
+                        + " " + icon + " "
+                        + "You " + action + " "
+                        + amount + " "
+                        + (transactionHistory.getTransactionType() == Transaction.TRANSFER
+                                ? "to " + Text.style.underline(Text.color.blue(transactionHistory.getToAccount()))
+                                : ""));
             }
         }
     }
