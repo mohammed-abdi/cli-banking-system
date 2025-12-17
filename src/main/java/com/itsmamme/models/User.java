@@ -3,12 +3,8 @@ package com.itsmamme.models;
 import com.itsmamme.enums.Gender;
 import com.itsmamme.enums.Role;
 import com.itsmamme.services.Auth;
-import com.itsmamme.utils.Text;
 
-public class User {
-    private String firstName;
-    private String lastName;
-    private int age;
+public class User extends AbstractBaseUser {
     private Gender gender;
     private Role role;
     public Account account;
@@ -28,26 +24,12 @@ public class User {
             boolean hashPassword
 
     ) {
-        setFirstName(firstName);
-        setLastName(lastName);
-        setAge(age);
+        super(firstName, lastName, age);
         setGender(gender);
         setRole(role);
         setUsername(username);
         setPassword(password, hashPassword);
         account = new Account(accountNumber, balance);
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public int getAge() {
-        return age;
     }
 
     public Gender getGender() {
@@ -64,18 +46,6 @@ public class User {
 
     public String getPassword() {
         return password;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = Text.normalizeCapitalization(firstName);
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = Text.normalizeCapitalization(lastName);
-    }
-
-    public void setAge(int age) {
-        this.age = age;
     }
 
     public void setGender(Gender gender) {
