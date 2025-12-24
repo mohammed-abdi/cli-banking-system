@@ -15,6 +15,7 @@ import com.itsmamme.models.User;
 import com.itsmamme.repositories.TransactionHistoryRepository;
 import com.itsmamme.repositories.UserRepository;
 import com.itsmamme.ui.Screen;
+import com.itsmamme.utils.ConsoleInputHandler;
 import com.itsmamme.utils.Message;
 import com.itsmamme.utils.Policy;
 import com.itsmamme.utils.Terminal;
@@ -22,6 +23,7 @@ import com.itsmamme.utils.Text;
 
 public final class Prompt extends Policy {
     private static final Scanner scanner = new Scanner(System.in);
+    private static final ConsoleInputHandler input = new ConsoleInputHandler();
     private static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private Prompt() {
@@ -105,19 +107,7 @@ public final class Prompt extends Policy {
         String firstName = scanner.next().trim();
         System.out.print(Message.request("last name"));
         String lastName = scanner.next().trim();
-        int age;
-        while (true) {
-            System.out.print(Message.request("age"));
-            try {
-                age = scanner.nextInt();
-                scanner.nextLine();
-                break;
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println(Message.error("Invalid age"));
-                System.out.println(Terminal.decorator.separator());
-            }
-        }
+        int age = input.readAge("age", MIN_AGE, MAX_AGE);
         boolean genderChoice = confirm("male");
         Gender gender = genderChoice ? Gender.MALE : Gender.FEMALE;
         boolean roleChoice = confirm("admin");
@@ -133,21 +123,7 @@ public final class Prompt extends Policy {
             System.out.println(Message.error("Username already taken"));
             System.out.println(Terminal.decorator.separator());
         }
-        String password;
-        while (true) {
-            System.out.print(Message.request("password"));
-            String newPassword = scanner.next().trim();
-            System.out.print(Message.request("confirm password"));
-            String confirmPassword = scanner.next().trim();
-
-            if (newPassword.equals(confirmPassword)) {
-                password = newPassword;
-                break;
-            }
-
-            System.out.println(Message.error("Password don't match"));
-            System.out.println(Terminal.decorator.separator());
-        }
+        String password = input.readNewPassword();
         String accountNumber;
         while (true) {
             System.out.print(Message.request("account number"));
@@ -178,19 +154,7 @@ public final class Prompt extends Policy {
         String firstName = scanner.next().trim();
         System.out.print(Message.request("last name"));
         String lastName = scanner.next().trim();
-        int age;
-        while (true) {
-            System.out.print(Message.request("age"));
-            try {
-                age = scanner.nextInt();
-                scanner.nextLine();
-                break;
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println(Message.error("Invalid age"));
-                System.out.println(Terminal.decorator.separator());
-            }
-        }
+        int age = input.readAge("age", MIN_AGE, MAX_AGE);
         boolean genderChoice = confirm("male");
         Gender gender = genderChoice ? Gender.MALE : Gender.FEMALE;
         Role role = Role.USER;
@@ -205,21 +169,7 @@ public final class Prompt extends Policy {
             System.out.println(Message.error("Username already taken"));
             System.out.println(Terminal.decorator.separator());
         }
-        String password;
-        while (true) {
-            System.out.print(Message.request("password"));
-            String newPassword = scanner.next().trim();
-            System.out.print(Message.request("confirm password"));
-            String confirmPassword = scanner.next().trim();
-
-            if (newPassword.equals(confirmPassword)) {
-                password = newPassword;
-                break;
-            }
-
-            System.out.println(Message.error("Password don't match"));
-            System.out.println(Terminal.decorator.separator());
-        }
+        String password = input.readNewPassword();
         String accountNumber;
         while (true) {
             System.out.print(Message.request("account number"));
@@ -304,19 +254,7 @@ public final class Prompt extends Policy {
                 + Text.style.underline(Text.color.blue(String.valueOf(user.getAge()))));
         System.out.println(Terminal.decorator.separator());
 
-        int age;
-        while (true) {
-            System.out.print(Message.request("age"));
-            try {
-                age = scanner.nextInt();
-                scanner.nextLine();
-                break;
-            } catch (Exception e) {
-                scanner.nextLine();
-                System.out.println(Message.error("Invalid age"));
-                System.out.println(Terminal.decorator.separator());
-            }
-        }
+        int age = input.readAge("age", MIN_AGE, MAX_AGE);
 
         int prevAge = user.getAge();
         user.setAge(age);
@@ -408,22 +346,7 @@ public final class Prompt extends Policy {
         }
 
         System.out.println(Terminal.decorator.separator());
-        String password;
-
-        while (true) {
-            System.out.print(Message.request("new password"));
-            String newPassword = scanner.next().trim();
-            System.out.print(Message.request("confirm password"));
-            String confirmPassword = scanner.next().trim();
-
-            if (newPassword.equals(confirmPassword)) {
-                password = newPassword;
-                break;
-            }
-
-            System.out.println(Message.error("Password don't match"));
-            System.out.println(Terminal.decorator.separator());
-        }
+        String password = input.readNewPassword();
 
         user.setPassword(password, true);
         System.out.println(Message.success("Password changed successfully"));
@@ -452,15 +375,7 @@ public final class Prompt extends Policy {
     public static void settings(User user) {
         while (true) {
             Screen.settings();
-            int choice;
-
-            try {
-                choice = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                System.out.println(Message.error("Please enter a number "));
-                scanner.nextLine();
-                continue;
-            }
+            int choice = input.readInt(null, 1, 7);
 
             switch (choice) {
                 case 1:
@@ -540,15 +455,7 @@ public final class Prompt extends Policy {
                     System.out.println(Terminal.decorator.separator());
                     Screen.listChoices(choices);
 
-                    int choice;
-
-                    try {
-                        choice = scanner.nextInt();
-                    } catch (InputMismatchException e) {
-                        System.out.println(Message.error("Please enter a number"));
-                        scanner.nextLine();
-                        continue;
-                    }
+                    int choice = input.readInt(null, 1, choices.length);
 
                     switch (choice) {
                         case 1:
@@ -617,13 +524,13 @@ public final class Prompt extends Policy {
 
                 case 402:
                     System.out.println(Message.error(
-                            NumberFormat.getNumberInstance(Locale.US).format(minDepositAmount)
+                            NumberFormat.getNumberInstance(Locale.US).format(MIN_DEPOSIT_AMOUNT)
                                     + " is the minimum deposit"));
                     break;
 
                 case 403:
                     System.out.println(
-                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(maxDepositAmount)
+                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(MAX_DEPOSIT_AMOUNT)
                                     + " is the maximum deposit, please reach out to our nearby branch"));
                     break;
 
@@ -666,13 +573,13 @@ public final class Prompt extends Policy {
 
                 case 402:
                     System.out.println(Message.error(
-                            NumberFormat.getNumberInstance(Locale.US).format(minWithdrawalAmount)
+                            NumberFormat.getNumberInstance(Locale.US).format(MIN_WITHDRAWAL_AMOUNT)
                                     + " is the minimum withdrawal"));
                     break;
 
                 case 403:
                     System.out.println(
-                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(maxWithdrawalAmount)
+                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(MAX_WITHDRAWAL_AMOUNT)
                                     + " is the maximum withdrawal, please reach out to our nearby branch"));
                     break;
 
@@ -746,13 +653,13 @@ public final class Prompt extends Policy {
 
                 case 402:
                     System.out.println(Message.error(
-                            NumberFormat.getNumberInstance(Locale.US).format(minWithdrawalAmount)
+                            NumberFormat.getNumberInstance(Locale.US).format(MIN_WITHDRAWAL_AMOUNT)
                                     + " is the minimum transfer amount"));
                     break;
 
                 case 403:
                     System.out.println(
-                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(maxWithdrawalAmount)
+                            Message.error(NumberFormat.getNumberInstance(Locale.US).format(MAX_WITHDRAWAL_AMOUNT)
                                     + " is the maximum transfer amount, please reach out to our nearby branch"));
                     break;
 

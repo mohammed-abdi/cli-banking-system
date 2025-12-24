@@ -1,10 +1,8 @@
 package com.itsmamme.services;
 
-import java.util.InputMismatchException;
-import java.util.Scanner;
-
 import com.itsmamme.models.User;
 import com.itsmamme.ui.Screen;
+import com.itsmamme.utils.ConsoleInputHandler;
 import com.itsmamme.utils.Message;
 import com.itsmamme.utils.Text;
 
@@ -12,19 +10,12 @@ public final class Menu {
     private Menu() {
     }
 
-    private static final Scanner scanner = new Scanner(System.in);
+    private static final ConsoleInputHandler input = new ConsoleInputHandler();
 
     public static void admin(User user) {
-        int choice;
-
         adminLoop: while (true) {
             Screen.dashboard(user);
-            try {
-                choice = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                choice = 6;
-                scanner.nextLine();
-            }
+            int choice = input.readInt(null, 1, 5);
 
             switch (choice) {
                 case 1:
@@ -42,9 +33,6 @@ public final class Menu {
                 case 5:
                     Prompt.logout(user.getUsername());
                     break adminLoop;
-                case 6:
-                    System.out.println(Message.error("Please enter a number"));
-                    break;
                 default:
                     System.out.println(Message.error("An unexpected error occurred. Please try again"));
                     break;
@@ -53,16 +41,9 @@ public final class Menu {
     }
 
     public static void user(User user) {
-        int choice;
-
         userLoop: while (true) {
             Screen.dashboard(user);
-            try {
-                choice = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                choice = 7;
-                scanner.nextLine();
-            }
+            int choice = input.readInt(null, 1, 6);
 
             switch (choice) {
                 case 1:
@@ -83,9 +64,6 @@ public final class Menu {
                 case 6:
                     Prompt.logout(user.getUsername());
                     break userLoop;
-                case 7:
-                    System.out.println(Message.error("Please enter a number"));
-                    break;
                 default:
                     System.out.println(Message.error("An unexpected error occurred. Please try again"));
                     break;
@@ -94,15 +72,9 @@ public final class Menu {
     }
 
     public static boolean auth() {
-        int choice;
         while (true) {
             Screen.home();
-            try {
-                choice = scanner.nextInt();
-            } catch (InputMismatchException e) {
-                choice = 5;
-                scanner.nextLine();
-            }
+            int choice = input.readInt(null, 1, 4);
 
             switch (choice) {
                 case 1:
@@ -118,9 +90,6 @@ public final class Menu {
                     System.out.println(
                             Message.info("Program ended. " + Text.style.underline(Text.color.blue("Thank you!"))));
                     return false;
-                case 5:
-                    System.out.println(Message.error("Please enter a number"));
-                    return true;
                 default:
                     System.out.println(Message.error("An unexpected error occurred. Please try again"));
                     return true;
