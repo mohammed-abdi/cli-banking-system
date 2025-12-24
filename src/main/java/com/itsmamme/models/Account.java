@@ -23,9 +23,9 @@ public class Account extends Policy {
     public int deposit(double amount) {
         if (!isValid(amount)) {
             return 400;
-        } else if (amount < minDepositAmount) {
+        } else if (amount < MIN_DEPOSIT_AMOUNT) {
             return 402;
-        } else if (amount >= maxDepositAmount) {
+        } else if (amount >= MAX_DEPOSIT_AMOUNT) {
             return 403;
         } else {
             balance = balance + amount;
@@ -37,9 +37,9 @@ public class Account extends Policy {
     public int withdraw(double amount) {
         if (!isValid(amount)) {
             return 400;
-        } else if (amount < minWithdrawalAmount) {
+        } else if (amount < MIN_WITHDRAWAL_AMOUNT) {
             return 402;
-        } else if (amount >= maxWithdrawalAmount) {
+        } else if (amount >= MAX_WITHDRAWAL_AMOUNT) {
             return 403;
         } else if (amount > balance) {
             return 405;
